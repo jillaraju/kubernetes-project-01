@@ -1,0 +1,16 @@
+app:
+  name: vproapp
+  replicaCount: 1
+
+  containerPort: 8080
+
+  image:
+    repository: vprocontainers/vprofileapp
+    tag: latest
+    pullPolicy: Always
+
+db:
+  serviceName: vprodb
+
+memcached:
+  serviceName: vprocache01

@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.app.name }}
+  labels:
+    app: {{ .Values.app.name }}
+
+spec:
+  replicas: {{ .Values.app.replicaCount }}
+
+  selector:
+    matchLabels:
+      app: {{ .Values.app.name }}
+
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.app.name }}
+
+    spec:
+
+      initContainers:
+      - name: init-mydb
+        image: busybox
+        args:
+        - -c
+        - >
+          until nslookup {{ .Values.db.serviceName }}.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local;
+          do
+            echo waiting for database;
+            sleep 2;
+          done;
+
+      - name: init-memcache
+        image: busybox
+        args:
+        - -c
+        - >
+          until nslookup {{ .Values.memcached.serviceName }}.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local;
+          do
+            echo waiting for memcache;
+            sleep 2;
+          done;
+
+      containers:
+      - name: {{ .Values.app.name }}
+
+        image: "{{ .Values.app.image.repository }}:{{ .Values.app.image.tag }}"
+
+        imagePullPolicy: {{ .Values.app.image.pullPolicy }}
+
+        ports:
+        - name: http
+          containerPort: {{ .Values.app.containerPort }}
