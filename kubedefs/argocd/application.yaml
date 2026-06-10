@@ -10,7 +10,7 @@ spec:
   source:
     repoURL: https://github.com/jillaraju/kubernetes-project-01.git
     targetRevision: main
-    path: myapp
+    path: kubedefs/myapp
 
   destination:
     server: https://kubernetes.default.svc
